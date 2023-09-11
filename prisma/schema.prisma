@@ -1,0 +1,608 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Inventory {
+  id                      String   @id
+  projectName             String?
+  companyName             String?
+  projectId               String?
+  serialNo                Int?
+  directoryNo             String?
+  recievedDate            String?
+  materialCode            String?
+  materialCategory        String?
+  materialSubCategory     String?
+  materialDesc            String?
+  units                   Int?
+  uom                     String?
+  dispatchedQty           Int?
+  recdQty                 Int?
+  vendorName              String?
+  vendorID                String?
+  vendorAddress           String?
+  transportName           String?
+  AWB_no                  String?
+  AWB_DT                  String?
+  eway_bill_no            String?
+  vendorInvoiceNo         String?
+  commInvoiceNo           String?
+  date                    String?
+  status                  String?
+  vehicleNo               String?
+  vehicleReleasedAtSite   String?
+  vehicleReleasedFromSite String?
+  storage                 String?
+  ownedGP                 String?
+  transferredGP           String[]
+  is_deleted              Boolean  @default(false)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model Project {
+  id           String   @id
+  name         String
+  assignedTo   String[]
+  gpName       String?
+  blockName    String?
+  locationName String?
+  stores       String[]
+  bomAwsExcel       String?
+  boqAwsExcel     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Quotation {
+  id                  String   @id
+  quotationId         String?   
+  projectId           String
+  projectName         String
+  prId                String?
+  vendorId            String?
+  vendorName          String
+  materialCode        String?
+  materialCategory    String?
+  materialSubCategory String?
+  materialDescription String?
+  uom                 String?
+  quantity            Int?
+  rate                Float?
+  amount              Float?
+  gst                 String?
+  gstAmount           Float?
+  remark              String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model ComparisionOfQuotation {
+  id  String @id @default(uuid())
+  comparisionId String?
+  prId String?
+  projectId String?
+  projectName String?
+  selectedVendorsIds String[]
+  remarks String?
+  isApproved Boolean @default(false)
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+
+model idGeneration {
+  id       Int    @id @default(autoincrement()) @map("custom_id")
+  uniqueId String @unique
+}
+
+model Category {
+  id            String        @id @default(uuid())
+  userId        String
+  name          String        @unique
+  subcategories Subcategory[]
+}
+
+model Subcategory {
+  id               String           @id @default(uuid())
+  userId           String
+  name             String           @unique
+  categoryId       String // Updated to String type
+  category         Category         @relation(fields: [categoryId], references: [id])
+  subsubcategories Subsubcategory[]
+}
+
+model Subsubcategory {
+  id            String      @id @default(uuid())
+  userId        String
+  name          String      @unique
+  subcategoryId String // Updated to String type
+  subcategory   Subcategory @relation(fields: [subcategoryId], references: [id])
+}
+
+model ItemProduct {
+  id             String   @id
+  productCode    String?
+  userId         String
+  category       String
+  subcategory    String
+  subsubcategory String
+  product        String
+  quantity       Int      @default(0)
+  unit           String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Vendors {
+  id         String   @id
+  name       String
+  mobile     String
+  categories String[]
+  gstNo      String
+  address    String
+  invoices   String[]
+  folderName String
+  details    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model User {
+  id               String   @id
+  name             String
+  mobile           String?  @unique
+  password         String
+  company          String
+  role             String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  otp              Int
+  isVerified       Boolean
+  email            String?
+  projectsAssigned String[]
+}
+
+model Documents {
+  documentId   String   @id
+  documentName String
+  inventoryId  String
+  s3Key        String?
+  is_deleted   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model toDoList {
+  taskId          String   @id
+  userId          String
+  projectId       String?
+  taskDescription String?
+  taskStatus      Boolean  @default(false)
+  is_deleted      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model MRN {
+  mrnId             String   @id
+  mrnNumber         String
+  mrnDate           DateTime
+  poNumber          String
+  materialMainGroup String
+  materialSubGroup  String
+  itemDescription   String
+  uom               String
+  poQuantity        Float
+  mrnRate           Float
+  mrnAmount         Float
+  mrnQuantity       Float
+  balanceMrn        Float
+  vendorName        String
+  mrnContractorName String?
+  mrnGpName         String?
+  invoiceNumber     String
+  invoiceDate       DateTime
+  transporterName   String
+  grDocumentFileKey String[]
+  grDate            DateTime
+  vehicleNumber     String
+  ewayBillNumber    String
+  storageLocation   String
+  remark            String
+  isApproved        Boolean  @default(false)
+  is_deleted        Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model returnSiteToStoreFormData {
+  returnSiteToStoreId             String   @id
+  returnSiteToStoreNumber         String
+  returnSiteToStoreDate           DateTime
+  poNumber                        String
+  materialMainGroup               String
+  materialSubGroup                String
+  itemDescription                 String
+  returnSiteToStoreUom            String
+  poQuantity                      Float
+  rate                            Float
+  returnSiteToStoreAmount         Float
+  returnSiteToStoreQuantity       Float
+  balanceReturnSiteToStore        Float
+  vendorName                      String
+  invoiceNumber                   String
+  invoiceDate                     DateTime
+  transporterName                 String
+  grDocumentFileKey               String?
+  grDate                          DateTime
+  vehicleNumber                   String
+  ewayBillNumber                  String
+  storageLocation                 String
+  returnSiteToStoreContractorName String?
+  returnSiteToStoreGpName         String?
+  remark                          String
+  isApproved                      Boolean  @default(false)
+  is_deleted                      Boolean  @default(false)
+  createdAt                       DateTime @default(now())
+  updatedAt                       DateTime @updatedAt
+}
+
+model returnableIndentData {
+  returnableIndentId             String   @id
+  returnableIndentNumber         String
+  returnableIndentDate           DateTime
+  poNumber                       String
+  materialMainGroup              String
+  materialSubGroup               String
+  itemDescription                String
+  returnableIndentUom            String
+  poQuantity                     Float
+  returnableIndentRate           Float
+  returnableIndentAmount         Float
+  returnableIndentQuantity       Float
+  balanceReturnableIndent        Float
+  vendorName                     String
+  invoiceNumber                  String
+  invoiceDate                    DateTime
+  transporterName                String
+  grDocumentFileKey              String?
+  grDate                         DateTime
+  vehicleNumber                  String
+  ewayBillNumber                 String
+  storageLocation                String
+  returnableIndentContractorName String?
+  returnableIndentGpName         String?
+  remark                         String
+  isApproved                     Boolean  @default(false)
+  is_deleted                     Boolean  @default(false)
+  createdAt                      DateTime @default(now())
+  updatedAt                      DateTime @updatedAt
+}
+
+model SiteIndent {
+  indentId          String   @id
+  userId            String
+  indentDate        DateTime @default(now())
+  projectId         String?
+  project           String
+  store             String
+  block             String
+  gp                String
+  vendor            String
+  indentStatus      String
+  tableData         Json?
+  table             Json[]
+  inventoryCategory String
+  itemName          String
+  remark            String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model MaterialIssueNote {
+  minId      String   @id
+  userId     String
+  indentId   String
+  indentDate DateTime @default(now())
+  projectId  String?
+  project    String
+  store      String
+  block      String
+  gp         String
+  vendor     String
+  tableData  Json?
+  remark     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model PR {
+  prId                  String   @id
+  userId                String
+  prDate                DateTime @default(now())
+  projectName           String
+  projectCode           String
+  miNumber              String?  //Waste
+  miDate                String?  //Waste
+  clientName            String?
+  requestedDate         String?
+  employer              String?
+  materialDesc          String?  //Waste
+  unit                  String?  //Waste
+  quantity              String?  //Waste
+
+  tableData             Json?
+  remark                String?
+  status                Boolean  @default(false)
+  deliveryAdd           String
+  makePreference        String?
+  qualityInstruction    String?
+  inspectionInstruction String?
+  documents             String?
+  remarks               String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model MTO {
+  mtoId             String   @id
+  userId            String //can change to store id
+  mtoNumber         String
+  mtoDate           DateTime
+  mtoDescription    String
+  mtoUom            String
+  mtoQuantity       Float
+  mtoRate           Float
+  mtoAmount         Float
+  mtoContractorName String
+  mtoGpName         String
+  remark            String
+  isApproved        Boolean  @default(false)
+  is_deleted        Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model BOM {
+  bomId               String   @id
+  materialName        String
+  materialDescription String
+  isApproved          Boolean  @default(false)
+  is_deleted          Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model PurchaseOrder {
+  poId                     String   @id
+  projectName              String?
+  projectId               String?
+  poDate                  String?
+  quotationDate                  String?
+  msName                   String?
+  msAddress                String?
+  msGst                    String?
+  contactPersonName        String?
+  contactPersonMobile      String?
+  contactPersonEmail       String?
+  poValidity               String?
+
+  orderStatus              String?
+  subjectOfPo              String?
+  referrenceSite           String?
+  tableData                 Json?
+  // otherTermsAndConditions  String
+  changedBillingAddress    String?
+  billingAddress    String?
+  deliveryAddress          String?
+  secondaryDeliveryAddress String?
+  deliveryTerms            String?
+  deliveryTime             String?
+  paymentTerms             String?
+  tpiStatus                String?
+  contactAtHeadOffice      String?
+  quantityAndQuality      String?
+  otherTermsInDPR          String?
+  documentS3Key            String?
+  poStatus                 String?
+  isApproved               Boolean  @default(false)
+  is_deleted               Boolean  @default(false)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+}
+
+model BOQ {
+  boqId       Int    @id @default(autoincrement())
+  boqDistrict String
+  boqNameOfGp String
+}
+
+
+// yash Models for WorkOrder
+
+
+model WorkOrderScopeOfWork {
+  scopeOfWorkId String @id @default(uuid())
+  title String?
+  value String?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+model WorkOrderPriceBasis {
+  priceBasisId String @id @default(uuid())
+  value String?
+  title String?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+model WorkOrderTaxesAndDuties {
+  title String?
+  taxesAndDutiesId String @id @default(uuid())
+  value String?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+model WorkOrderPaymentTerms {
+  paymentTermsId String @id @default(uuid())
+  value String?
+  title String?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+model WorkOrderWorkCompSchedule {
+  workCompScheduleId String @id @default(uuid())
+  value String?
+  title String?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+model WorkOrderKMP {
+  kMPId String @id @default(uuid())
+  value String?
+  title String?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+model WorkOrderInspections {
+  inspectionsId String @id @default(uuid())
+  value String?
+  title String?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+model WorkOrderDLP {
+  dLPId String @id @default(uuid())
+  value String?
+  title String?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+model WorkOrderSafetyRequirements {
+  safetyRequirementsId String @id @default(uuid())
+  value String?
+  title String?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+model WorkOrderStatutoryRequirements {
+  statutoryRequirementsId String @id @default(uuid())
+  value String?
+  title String?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+model WorkOrderOtherTAndC {
+  otherTAndCId String @id @default(uuid())
+  value String?
+  title String?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+model WorkOrderGeneral {
+  generalId String @id @default(uuid())
+  value String?
+  title String?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+model WorkOrderOther {
+  otherId String @id @default(uuid())
+  value String?
+  title String?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+model WorkOrderNote {
+  noteId String @id @default(uuid())
+  value String?
+  title String?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+model WorkOrderPerformanceAndTermination {
+  performanceId String @id @default(uuid())
+  value String?
+  title String?
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+// model WorkOrderTransportation {
+//   transportationId String @id @default(uuid())
+//   noteId String ?
+//   value String?
+//   createdBy String?
+//   createdAt DateTime @default(now())
+// }
+model WorkOrderTransport {
+  transportationId String @id @default(uuid())
+  value String?
+  createdBy String?
+    title String?
+  createdAt DateTime @default(now())
+}
+
+model WorkOrder{
+  workOrderId String @id
+  vendorId String?
+  vendorName String?
+  name String?
+  address String?
+  workOrderDate DateTime @default(now())
+  gstInNo String?
+  Amend String?
+  AmendDate String?
+  panNo String?
+  kindAttn String?
+  mobileNo String?
+  emailId String?
+  subject String?
+  quotationDate DateTime?
+  tableData Json?
+  scopeOfWork String?
+  transportation String?
+  priceBasis String?
+  taxesAndDuties String?
+  paymentTerms String?
+  workCompletionSchedule String?
+  keyMaterialsProcurement String?
+  performanceAndTermination String?
+  inspections String?
+  defectLiabilityPeriod String?
+  safetyRequirement String?
+  statutoryRequirement String?
+  otherTermAndCondition String?
+  general String?
+  other String?
+  note String?
+  pdfOfWorkOrder String?
+  billingAddress String?
+  deliveryAddress String?
+  nameOfCompanyInAddress String?
+}
+
+
+
+

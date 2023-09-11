@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "PR" ADD COLUMN     "status" BOOLEAN NOT NULL DEFAULT false,
+ALTER COLUMN "makePreference" DROP NOT NULL,
+ALTER COLUMN "qualityInstruction" DROP NOT NULL,
+ALTER COLUMN "inspectionInstruction" DROP NOT NULL,
+ALTER COLUMN "documents" DROP NOT NULL,
+ALTER COLUMN "remarks" DROP NOT NULL;

@@ -1,0 +1,51 @@
+const mongoose = require('mongoose');
+
+const workOrderSchema = new mongoose.Schema({
+  workOrderId: { type: String, required: true },
+  vendorId: String,
+  projectId: String,
+  vendorName: String,
+  projectName: String,
+  name: String,
+  address: String,
+  workOrderDate: { type: Date, default: Date.now },
+  gstInNo: String,
+  amend: { type: Number, default: 0 },
+  amendDate: String,
+  panNo: String,
+  kindAttn: String,
+  mobileNo: String,
+  emailId: String,
+  subject: String,
+  quotationDate: Date,
+  tableData: mongoose.Schema.Types.Mixed,
+  scopeOfWork: String,
+  transportation: String,
+  priceBasis: String,
+  taxesAndDuties: String,
+  paymentTerms: String,
+  workCompletionSchedule: String,
+  keyMaterialsProcurement: String,
+  performanceAndTermination: String,
+  inspections: String,
+  defectLiabilityPeriod: String,
+  safetyRequirement: String,
+  statutoryRequirement: String,
+  otherTermAndCondition: String,
+  general: String,
+  other: String,
+  note: String,
+  pdfOfWorkOrder: String,
+  billingAddress: String,
+  deliveryAddress: String,
+  preparedBy:String,
+  isApproved: { type: Boolean, default: false },
+  approvedBy:String,
+  approvedOnDate:String,
+  nameOfCompanyInAddress: String,
+  createdAt:{type:String, default:new Date(Date.now())}
+});
+
+const WorkOrder = mongoose.model('WorkOrder', workOrderSchema);
+
+module.exports = WorkOrder;
